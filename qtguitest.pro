@@ -71,7 +71,7 @@ win32 {
         _OUTDIR = release
     }
 
-    LIBS += "$$_PRO_FILE_PWD_/vendor/portaudio/lib/portaudio_x86.lib"
+    LIBS += "$$_PRO_FILE_PWD_/vendor/portaudio/lib/portaudio_x86.lib" setupapi.lib
     SOURCES += vendor/hidapi/hid-windows.c
 
     libstocopy.files = $$_PRO_FILE_PWD_/vendor/portaudio/lib/portaudio_x86.dll \
