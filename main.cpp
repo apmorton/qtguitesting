@@ -2,6 +2,7 @@
 #include <QApplication>
 #include <QMessageBox>
 #include "portaudio.h"
+#include "hidapi/hidapi.h"
 
 int main(int argc, char *argv[])
 {
@@ -15,6 +16,10 @@ int main(int argc, char *argv[])
         return QMessageBox::critical(&w, title, message.arg("Initializing").arg(Pa_GetVersionText()).arg(Pa_GetErrorText(err)), QMessageBox::Ok, QMessageBox::NoButton);
     }
 
+    if (hid_init() != 0) {
+        return QMessageBox::critical(&w, QString("HID API Error"), QString("Error Initializing HID API"), QMessageBox::Ok, QMessageBox::NoButton);
+    }
+
     w.show();
 
     int ret = a.exec();
@@ -22,6 +27,10 @@ int main(int argc, char *argv[])
     err = Pa_Terminate();
     if (err != paNoError) {
         return QMessageBox::critical(&w, title, message.arg("Terminating").arg(Pa_GetVersionText()).arg(Pa_GetErrorText(err)), QMessageBox::Ok, QMessageBox::NoButton);
+    }
+
+    if (hid_exit() != 0) {
+        return QMessageBox::critical(&w, QString("HID API Error"), QString("Error Terminating HID API"), QMessageBox::Ok, QMessageBox::NoButton);
     }
 
     return ret;

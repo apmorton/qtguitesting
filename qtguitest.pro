@@ -11,32 +11,6 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 TARGET = qtguitest
 TEMPLATE = app
 
-unix:LIBS += "$$_PRO_FILE_PWD_/vendor/portaudio/lib/libportaudio.a" -lasound
-win32 {
-    CONFIG(debug, debug|release) {
-        _OUTDIR = debug
-        _D = d
-    } else {
-        _OUTDIR = release
-    }
-
-    LIBS += "$$_PRO_FILE_PWD_/vendor/portaudio/lib/portaudio_x86.lib"
-
-    libstocopy.files = $$_PRO_FILE_PWD_/vendor/portaudio/lib/portaudio_x86.dll \
-        $$[QT_INSTALL_BINS]/icudt51.dll \
-        $$[QT_INSTALL_BINS]/icuin51.dll \
-        $$[QT_INSTALL_BINS]/icuuc51.dll \
-        $$[QT_INSTALL_BINS]/libEGL$${_D}.dll \
-        $$[QT_INSTALL_BINS]/libGLESv2$${_D}.dll \
-        $$[QT_INSTALL_BINS]/Qt5Core$${_D}.dll \
-        $$[QT_INSTALL_BINS]/Qt5Gui$${_D}.dll \
-        $$[QT_INSTALL_BINS]/Qt5PrintSupport$${_D}.dll \
-        $$[QT_INSTALL_BINS]/Qt5Widgets$${_D}.dll \
-        $$[QT_INSTALL_PLUGINS]/platform/qwindows$${_D}.dll
-    libstocopy.path = $$OUT_PWD/$$_OUTDIR
-    INSTALLS += libstocopy
-}
-
 SOURCES += main.cpp \
     mainwindow.cpp \
     qfreqbin.cpp \
@@ -76,8 +50,41 @@ HEADERS  += mainwindow.h \
     vendor/portaudio/include/pa_win_wasapi.h \
     vendor/portaudio/include/pa_win_ds.h \
     vendor/portaudio/include/pa_asio.h \
-    vendor/qcustomplot/qcustomplot.h
+    vendor/qcustomplot/qcustomplot.h \
+    vendor/hidapi/hidapi.h
 
 FORMS    += mainwindow.ui
 
 OTHER_FILES +=
+
+unix {
+    CONFIG += link_pkgconfig
+    PKGCONFIG += libudev
+    LIBS += "$$_PRO_FILE_PWD_/vendor/portaudio/lib/libportaudio.a" -lasound -lrt
+    SOURCES += vendor/hidapi/hid-linux.c
+}
+win32 {
+    CONFIG(debug, debug|release) {
+        _OUTDIR = debug
+        _D = d
+    } else {
+        _OUTDIR = release
+    }
+
+    LIBS += "$$_PRO_FILE_PWD_/vendor/portaudio/lib/portaudio_x86.lib"
+    SOURCES += vendor/hidapi/hid-windows.c
+
+    libstocopy.files = $$_PRO_FILE_PWD_/vendor/portaudio/lib/portaudio_x86.dll \
+        $$[QT_INSTALL_BINS]/icudt51.dll \
+        $$[QT_INSTALL_BINS]/icuin51.dll \
+        $$[QT_INSTALL_BINS]/icuuc51.dll \
+        $$[QT_INSTALL_BINS]/libEGL$${_D}.dll \
+        $$[QT_INSTALL_BINS]/libGLESv2$${_D}.dll \
+        $$[QT_INSTALL_BINS]/Qt5Core$${_D}.dll \
+        $$[QT_INSTALL_BINS]/Qt5Gui$${_D}.dll \
+        $$[QT_INSTALL_BINS]/Qt5PrintSupport$${_D}.dll \
+        $$[QT_INSTALL_BINS]/Qt5Widgets$${_D}.dll \
+        $$[QT_INSTALL_PLUGINS]/platform/qwindows$${_D}.dll
+    libstocopy.path = $$OUT_PWD/$$_OUTDIR
+    INSTALLS += libstocopy
+}

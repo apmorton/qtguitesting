@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QTimer>
 #include "portaudio.h"
+#include "hidapi/hidapi.h"
 
 namespace Ui {
 class MainWindow;
@@ -19,6 +20,7 @@ public:
 
 public slots:
     void drawChart();
+    void writeColor();
 
 private slots:
     void on_actionOpen_Stream_triggered();
@@ -27,10 +29,17 @@ private slots:
 
     void on_actionHanning_Window_toggled(bool arg1);
 
+    void on_actionOpen_HID_toggled(bool arg1);
+
 private:
     Ui::MainWindow *ui;
-    PaStream *stream;
     QTimer *drawTimer;
+    QTimer *devTimer;
+
+    PaStream *stream;
+    hid_device *device;
+
+    int v;
 };
 
 #endif // MAINWINDOW_H
