@@ -31,6 +31,9 @@ QVector<double> mag_data(NUM_SAMPLES/2, 0);
 QVector<double> hist_data(DB_WIDTH, 0);
 QVector<double> hist_v_data(DB_WIDTH, 0);
 
+QVector<double> hue_data(360, 0);
+QVector<double> hue_x_data(360, 0);
+
 bool useHanningWindow = true;
 double interval = (((double)SAMPLE_RATE)/2) / (NUM_SAMPLES / 2);
 
@@ -59,6 +62,13 @@ MainWindow::MainWindow(QWidget *parent) :
     for (int i = 0; i < DB_WIDTH; i++) {
         db_x_data[i] = v++;
     }
+
+    for (int i = 0; i < hue_x_data.size(); i++) {
+        hue_x_data[i] = i;
+    }
+
+    hueBars = new QCPBars(ui->colorPlot->xAxis, ui->colorPlot->yAxis);
+    ui->colorPlot->addPlottable(hueBars);
 
     ui->fftPlot->addGraph();
     ui->fftPlot->graph(0)->setLineStyle(QCPGraph::lsImpulse);
@@ -105,6 +115,8 @@ MainWindow::MainWindow(QWidget *parent) :
         ui->dbPlot->addGraph();
         ui->dbPlot->graph(i*2+1)->setLineStyle(QCPGraph::lsNone);
         ui->dbPlot->graph(i*2+1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, colors[i+1], colors[i+1], 3.0));
+
+        connect(bins[i], SIGNAL(newHue(int)), this, SLOT(newHue(int)));
     }
 
     ui->dbPlot->xAxis->setLabel("Time (Samples)");
@@ -127,6 +139,16 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::newHue(int hue) {
+    if (hue < 0 || hue > 360) return;
+
+    mutex.lock();
+
+    hue_data[hue] += 1;
+
+    mutex.unlock();
+}
+
 void MainWindow::drawChart() {
     mutex.lock();
 
@@ -139,13 +161,17 @@ void MainWindow::drawChart() {
 
     ui->levelPlot->graph(0)->setData(db_x_data, hist_data);
     ui->levelPlot->graph(1)->setData(db_x_data, hist_v_data);
-
+    hueBars->setData(hue_x_data, hue_data);
 
     mutex.unlock();
 
     ui->fftPlot->replot();
     ui->dbPlot->replot();
     ui->levelPlot->replot();
+
+
+    ui->colorPlot->rescaleAxes();
+    ui->colorPlot->replot();
 }
 
 typedef struct {

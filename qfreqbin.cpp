@@ -92,11 +92,18 @@ double QFreqBin::addSample(QVector<double> sample) {
     edge_data[maxi] = data[maxi];
 
     // generate a random hue
-    hue = random_in_range(0, 360);
+    //hue = random_in_range(0, 360);
 
-    // generate v
-    v = (int)((((dif * 100) / max) * 255) / 100) & 0xFF;
+    int shift = 11 * random_in_range(1, 10);
+    if (random_in_range(0, 1000) > 500)
+        hue += shift;
+    else
+        hue -= shift;
 
+    while (hue >= 360) hue -= 360;
+    while (hue < 0) hue += 360;
+
+    emit newHue(hue);
 
     return dif;
 }

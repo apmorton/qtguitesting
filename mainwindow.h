@@ -5,6 +5,7 @@
 #include <QTimer>
 #include "portaudio.h"
 #include "hidapi/hidapi.h"
+#include "qcustomplot.h"
 
 namespace Ui {
 class MainWindow;
@@ -21,6 +22,7 @@ public:
 public slots:
     void drawChart();
     void writeColor();
+    void newHue(int hue);
 
 private slots:
     void on_actionOpen_Stream_triggered();
@@ -35,6 +37,8 @@ private:
     Ui::MainWindow *ui;
     QTimer *drawTimer;
     QTimer *devTimer;
+
+    QCPBars *hueBars;
 
     PaStream *stream;
     hid_device *device;

@@ -20,6 +20,9 @@ public:
     int hue, v;
     int channel;
 
+signals:
+    void newHue(int hue);
+
 protected:
     int lower_idx;
     int upper_idx;
